@@ -1,0 +1,24 @@
+First, assume you have 0 prior context when deciphering the whole thing, like an operative in the field would have at start.
+
+By the time you get to K4, you likely have worked out that there are 4 parts. Also you have the plain text for K1, K2 and K3 as well as the keywords for K1 and K2 - PALIMPSEST and ABSCISSA
+
+You would know about the LAYERTWO bit of K" plaintext (if there Sanborn had not made the encryption mistake at the end of K2 which he genuinely admitted as a mistake and went public in order to correct it, therefore we can assume it has some relevance somewhere)
+
+You have noticed misspellings.
+
+You have noticed the raised letters at the start of K3
+
+You may have noticed that K1+K2 is 436 characters, while K3+K4 is 434 characters. Not an exact match but quite close
+
+Another possible hint is the S-shaped nature of the sculpture. It seems natural to fold one panel onto the other, like a folio.
+
+To me, this stream of hints point at some technique where you have to overlay the top half and the bottom half in some way and 
+
+
+
+
+3/9/23
+take CT chars, and when index is one of the raised letters pattern, offset by the correcponding layer 1 character. then calc IC
+
+
+
