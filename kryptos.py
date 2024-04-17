@@ -35,7 +35,7 @@ def genAlphabet(key: str) -> str:
 def encryptVigenere(text: str, alphabet: str, key: str) -> str:
     kl = len(key)
     ki = [alphabet. index(x) for x in key]
-
+    skipped = 0
     ct = ""
 
     for i in range(len(text)):
@@ -43,9 +43,10 @@ def encryptVigenere(text: str, alphabet: str, key: str) -> str:
         
         if c not in ALPHABET:
             ct += c
+            skipped += 1
             continue
 
-        p = (alphabet.index(c) + 26 + ki[i%kl]) % 26
+        p = (alphabet.index(c) + 26 + ki[(i-skipped)%kl]) % 26
         ct += alphabet[p]
 
     return ct
@@ -54,6 +55,7 @@ def encryptVigenere(text: str, alphabet: str, key: str) -> str:
 def decryptVigenere(text: str, alphabet: str, key: str) -> str:
     kl = len(key)
     ki = [alphabet.index(x) for x in key]
+    skipped = 0
 
     pt = ""
 
@@ -62,9 +64,10 @@ def decryptVigenere(text: str, alphabet: str, key: str) -> str:
         
         if c not in ALPHABET:
             pt += c
+            skipped += 1 
             continue
 
-        p = (alphabet.index(c) + 26 - ki[i%kl]) % 26
+        p = (alphabet.index(c) + 26 - ki[(i-skipped)%kl]) % 26
         pt += alphabet[p]
 
     return pt
@@ -170,6 +173,10 @@ def hasCribLetters(text: str, crib: str):
 # print()
 # print(varianceFromEnglish(K4CT))
 # print()
+
+print( decryptVigenere(K2CT, genAlphabet("KRYPTOS"), "ABSCISSA"))
+
+exit()
 
 # #------------------------------
 
