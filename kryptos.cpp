@@ -3,6 +3,7 @@
 #include <string>
 #include <algorithm>
 #include <fstream>
+#include <random>
 
 using namespace std;
 
@@ -280,6 +281,40 @@ string BlockRotate(const string &_Text)
     return RotateCW(left, 7) + RotateCCW(right, 7);
 }
 
+string Randomise(const string &_Text)
+{
+    string random;
+    vector<char> letters;
+
+    for (int i = 0; i < _Text.length(); ++i)
+    {
+        letters.push_back(_Text[i]);
+    }
+
+    while (letters.size() > 0)
+    {
+        int pos = (int)(((float)rand() / (float)RAND_MAX) * (letters.size() - 1));
+        random += letters[pos];
+        letters.erase(letters.begin() + pos);
+    }
+    return random;
+}
+
+string Shift(const string &_Text, int offset)
+{
+    string shifted;
+    offset = (offset + _Text.length()) % _Text.length();
+    for (int i = offset; i < _Text.length(); ++i)
+    {
+        shifted += _Text[i];
+    }
+    for (int i = 0; shifted.length() < _Text.length(); ++i)
+    {
+        shifted += _Text[i];
+    }
+    return shifted;
+}
+
 bool isAlpha(const string &_Text)
 {
     auto it = find_if(_Text.begin(), _Text.end(), [](char const &c)
@@ -326,26 +361,28 @@ void RunTests()
     printf("K2 PT: %s\n", K2PT.c_str());
 
     printf("K3CT variance: %f\n", VarianceFromEnglish(K3CT));
+    printf("K4CR variance: %f\n", VarianceFromEnglish(K4CR));
 
     printf("CW:  %s\n", RotateCW("ABCDABCDABC", 4).c_str());
     printf("CCW: %s\n", RotateCCW("ABCDABCDABC", 4).c_str());
 
     printf("%i\n", HasCribLetters("ABCDEABCDE", "BCBE"));
     printf("%i\n", HasCribLetters("ABCDEABCDE", "BCBEX"));
+
+    printf("%s\n", Shift("0123456789", 3).c_str());
+    printf("%s\n", Shift("0123456789", -3).c_str());
 }
 
-int main()
+struct Match
 {
-    RunTests();
+    string keyword;
+    string pt;
+    double variance;
+};
 
+void Attempt_RotateAndDecrypt()
+{
     string kAlphabet = GenAlphabet("KRYPTOS");
-
-    struct Match
-    {
-        string keyword;
-        string pt;
-        double variance;
-    };
 
     for (int r = 2; r < 49; ++r)
     {
@@ -382,17 +419,60 @@ int main()
         printf("%s\t%f\n", matches[0].keyword.c_str(), matches[0].variance);
         printf("%s\n", matches[0].pt.c_str());
         printf("%s\n\n", K4CR.c_str());
-
-        // for (int i = 0; i < matches.size(); ++i)
-        // {
-        //     if (matches[i].pt.find("EAST") != string::npos)
-        //     {
-        //         printf("%s\t%f\n", matches[i].keyword.c_str(), matches[i].variance);
-        //         printf("%s\n", matches[i].pt.c_str());
-        //         printf("%s\n\n", K4CR.c_str());
-        //     }
-        // }
     }
+}
+
+void Attempt_ShiftAndDecrypt()
+{
+    // Try all shifts ok K4 and then decrypt to see if one of the crib words appears
+    //  
+    // Outcome: Nothing interesting came out of it
+
+    string kAlphabet = GenAlphabet("KRYPTOS");
+
+    for (int off = 0; off < K4CT.length(); ++off)
+    {
+        string ct = Shift(K4CT, off);
+        printf("%s\n", ct.c_str());
+
+        vector<Match> matches;
+        ifstream file("Words.txt");
+        string word;
+        while (getline(file, word))
+        {
+            word = toUpper(makeAlpha(word));
+            if (word.length() == 0)
+            {
+                continue;
+            }
+
+            string pt = DecryptVigenere(ct, kAlphabet, word);
+            if (HasCribLetters(pt, K4CL) && (pt.find("CLOCK") != string::npos))
+            {
+                Match m;
+                m.keyword = word;
+                m.pt = pt;
+                m.variance = VarianceFromEnglish(pt);
+                matches.push_back(m);
+            }
+        }
+
+        sort(matches.begin(), matches.end(), [](const Match &a, const Match &b)
+             { return a.variance < b.variance; });
+
+        for (int i = 0; i < matches.size(); ++i)
+        {
+            printf("%s\t%f\t%s\n", matches[i].keyword.c_str(), matches[i].variance, matches[i].pt.c_str());
+        }
+    }
+}
+
+int main()
+{
+    RunTests();
+    
+    // Attempt_RotateAndDecrypt();
+    Attempt_ShiftAndDecrypt();
 
     return 0;
 }
